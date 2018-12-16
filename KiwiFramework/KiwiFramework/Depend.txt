@@ -1,0 +1,11 @@
+Dependency list
+
+Framework:
+  ButtonManager
+  ApplicationEvent
+  ConcurrentQueue
+  Renderer
+
+ButtonManager:
+  Button
+  Event
