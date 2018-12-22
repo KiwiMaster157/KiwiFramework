@@ -47,9 +47,15 @@
     <ClInclude Include="ButtonManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ConcurrentQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Depend.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="TODO.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

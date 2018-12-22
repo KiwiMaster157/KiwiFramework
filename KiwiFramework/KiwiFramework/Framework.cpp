@@ -1,4 +1,5 @@
 #include "Framework.h"
+#include <future>
 
 namespace kiwi
 {
@@ -22,22 +23,40 @@ Framework::~Framework()
 
 int Framework::run()
 {
-	running = true;
-	int x = runImpl();
-	running = false;
 	asynchronous = false;
-	return x;
+	return runImpl();
 }
 
-std::future<int> Framework::runAsync()
+int Framework::runAsync()
 {
 	asynchronous = true;
-	return std::async( [=] () { return run(); } );
+
+	std::future<int> x = std::async([=]() { return runImpl(); });
+	sf::Event e;
+
+	while (!x.valid())
+	{
+		if (window.pollEvent(e))
+			eventQueue.push(buttons.test(e));
+		/*
+		if (network.pollMessage(m))
+			eventQueue.push(networkTransform(m));
+		*/
+	}
+	
+	return x.get();
 }
 
-bool Framework::isRunning() const
+bool Framework::popEvent(ApplicationEvent& e)
 {
-	return running;
+	////Temporary implementation
+	if (eventQueue.empty())
+		return false;
+	e = eventQueue.front();
+	eventQueue.pop();
+	return true;
+	////Eventual implementation
+	//return eventQueue.pop(e);
 }
 
 int Framework::runImpl()
@@ -111,6 +130,20 @@ bool Framework::initFramework()
 void Framework::finishFramework()
 {
 
+}
+
+void Framework::pollEvents()
+{
+	if (std::this_thread::get_id() != mainThread)
+	{
+		throw std::logic_error("Events must be polled in the main thread.");
+	}
+
+	sf::Event e;
+	while (window.pollEvent(e))
+	{
+		eventQueue.push(buttons.test(e));
+	}
 }
 
 }//namespace v1

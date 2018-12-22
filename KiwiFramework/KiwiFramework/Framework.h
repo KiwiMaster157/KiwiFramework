@@ -3,8 +3,9 @@
 #include "ApplicationEvent.h"
 #include "ButtonManager.h"
 #include "Process.h"
-#include <future>
+#include "ConcurrentQueue.h"
 
+#include <thread>
 
 namespace kiwi
 {
@@ -30,24 +31,15 @@ public:
 	int run();
 
 	///Executes run in a different thread
-	std::future<int> runAsync();
+	int runAsync();
 
-	///Determines whether the application is running
-	bool isRunning() const;
+	bool popEvent(ApplicationEvent& e);
 
 	//=====Components=====
-	struct
-	{
-		sf::RenderWindow window;
-		ButtonManager buttons;
-		//ResourceManage resources;
-		
+	ButtonManager buttons;
+	//ResourceManage resources;
 
-		
 
-	} core;
-
-protected:
 
 	//=====Required implementation functions=====
 
@@ -57,9 +49,13 @@ protected:
 	///All events are passed through this function after framework processing
 	virtual ProcessStatus process(const ApplicationEvent& event) = 0;
 
+	///Executed at the end of a successful run
 	virtual void finish() = 0;
 
 private:
+
+	sf::RenderWindow window;
+	ConcurrentQueue<ApplicationEvent> eventQueue;
 
 	///Main event loop
 	int runImpl();
@@ -69,9 +65,15 @@ private:
 
 	void finishFramework();
 
-	bool running = false;
-	bool quit = false;
+	volatile bool quit = false;
 	bool asynchronous = false;
+
+	void pollEvents();
+
+	//Since the operating system limits polling windows for events
+	//  to the window's parent thread, this member can be used for 
+	//  ensuring that events are only polled in the correct thread.
+	std::thread::id mainThread = std::this_thread::get_id();
 
 };//class Framework
 

@@ -1,0 +1,5 @@
+Note: Event polling can only occur in the thread that owns the window.
+
+Write ConcurrentQueue
+Add concurrency to ButtonManager
+Add (private) function for 

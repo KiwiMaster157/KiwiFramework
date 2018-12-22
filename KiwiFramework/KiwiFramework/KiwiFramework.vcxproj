@@ -133,11 +133,13 @@
     <ClInclude Include="ApplicationEvent.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="ButtonManager.h" />
+    <ClInclude Include="ConcurrentQueue.h" />
     <ClInclude Include="Framework.h" />
     <ClInclude Include="Process.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Depend.txt" />
+    <Text Include="TODO.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
