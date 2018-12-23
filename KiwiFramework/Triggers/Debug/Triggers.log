@@ -1,2 +1,5 @@
-﻿  Driver.cpp
+﻿  Animatic.cpp
+  Driver.cpp
+  Generating Code...
+C:\Users\Reuben_2\Source\Repos\KiwiFramework\KiwiFramework\Triggers\Animatic.cpp(110): warning C4172: returning address of local variable or temporary
   Triggers.vcxproj -> C:\Users\Reuben_2\Source\Repos\KiwiFramework\KiwiFramework\Debug\Triggers.exe
