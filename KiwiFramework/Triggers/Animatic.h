@@ -1,60 +1,53 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include <filesystem>
+#include <chrono>
 
 namespace kiwi
 {
 inline namespace v1
 {
 
-struct SpriteRowInfo
-{
-	int start = 0;
-	int height = 0;
-	int colWidth = 0;
-	int colCount = 0;
-	sf::Time period = sf::seconds(0);
-};
-
-class Animation
+class Frame : public sf::Drawable
 {
 public:
-	Animation() = default;
+	explicit Frame(const sf::Texture* srcTexture);
+	virtual ~Frame() = default;
 
-	Animation(const Animation&) = delete;
-	Animation(Animation&&) = default;
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-	//When reading from a file, blank lines and lines starting with # are treated as comments
-	//The first meaningful line will be taken as the image file
-	//Each line following consists of row info, with time in milliseconds
-	//If there is an issue reading the file, returns false and leaves animation in an undefined state
-	bool readFromFile(const std::filesystem::path& file);
-
-	void reset();
-
-	const sf::Texture* getTexture() const;
-
-	int maxRows() const;
-
-	//Throws if out of bounds
-	const SpriteRowInfo& operator[](int index) const;
-
+	sf::Vertex& operator[](int x);
 private:
-	sf::Texture spriteSheet;
-	std::vector<SpriteRowInfo> reelData;
+	const sf::Texture* texture;
+	sf::VertexArray varray;
+};
+
+struct Animation
+{
+	using Period_t = std::chrono::steady_clock::duration;
+	using Time_t = std::chrono::steady_clock::time_point;
+	const sf::Texture* texture = nullptr;
+	int columns = 0;
+	int count = 0;
+	sf::Vector2i origin = { 0, 0 };
+	sf::Vector2i size = { 0, 0 };
+	Period_t period = std::chrono::seconds(0);
+	bool looping = true;
+
+	Frame frame(int index) const;
 };
 
 //Prefer composition over inheritance
-struct AnimatedSprite: public sf::Drawable, public sf::Transformable
+class AnimatedSprite: public sf::Drawable, public sf::Transformable
 {
 public:
 
 	AnimatedSprite() = default;
-	AnimatedSprite(const Animation* animation, int row);
+	explicit AnimatedSprite(const Animation* srcAnimation);
 
 	virtual ~AnimatedSprite() = default;
 
+	//Can be used to start a stopped animation 
 	void start(int offset = 0);
 
 	void stop();
@@ -64,18 +57,18 @@ public:
 	//From sf::Drawable:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override final;
 
+	int getFrameNumber() const;
+
 private:
 
-	const SpriteRowInfo& getRowInfo() const;
-	void updateFrame();
+	const Animation* animation = nullptr;
 
-	sf::Sprite toDraw;
-
-	const Animation* animationSheet = nullptr;
-	int animationRow = 0;
-
-	int animationFrame = 0;
-	sf::Clock timer;
+	union ChronoData
+	{
+		ChronoData();
+		std::chrono::steady_clock::time_point timer;
+		int frame = 0;
+	} chrono;
 	bool running = false;
 };
 

@@ -1,95 +1,82 @@
 #include "Animatic.h"
-#include <fstream>
-#include <sstream>
 
 namespace kiwi
 {
 inline namespace v1
 {
 
-//=====Animation=====
+Frame::Frame(const sf::Texture* srcImage)
+	: texture(srcImage), varray(sf::TriangleStrip, 4)
+{}
 
-bool Animation::readFromFile(const std::filesystem::path& file)
+void Frame::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	std::ifstream fin(file);
-	std::string line;
-	bool needFile = true;
+	states.texture = texture;
+	target.draw(varray, states);
+}
 
-	if (!fin.is_open())
-		return false;
+sf::Vertex& Frame::operator[](int x)
+{
+	return varray[x];
+}
 
-	reelData.clear();
+//=====Animation=====
+Frame Animation::frame(int index) const
+{
+	if (index < 0)
+		throw std::out_of_range("Negative frame position does not exist.");
 
-	while (std::getline(fin, line))
+	if (index <= count)
 	{
-		if (!line.length() || line[0] == '#')//line is comment
-			continue;
-		if (needFile)
-		{
-			if (!spriteSheet.loadFromFile(line))
-				return false;
-			needFile = false;
-		}
-		else
-		{
-			reelData.push_back(SpriteRowInfo());
-			SpriteRowInfo& last = reelData.back();
-			std::stringstream lineData;
-			lineData << line;
-			lineData >> last.start >> last.height >> last.colWidth >> last.colWidth;
-			int millisec;
-			lineData >> millisec;
-			last.period = sf::milliseconds(millisec);
-			if (!lineData)
-				return false;
-		}
+		Frame retval(texture);
+
+		int row = index / columns;
+		int col = index % columns;
+
+		float left = static_cast<float>(origin.x + size.x * col);
+		float top  = static_cast<float>(origin.y + size.y * row);
+		float width = static_cast<float>(size.x);
+		float height = static_cast<float>(size.y);
+
+		//Set position
+		retval[0].position = sf::Vector2f(0, 0);
+		retval[1].position = sf::Vector2f(0, height);
+		retval[2].position = sf::Vector2f(width, 0);
+		retval[3].position = sf::Vector2f(width, height);
+
+		//Set texCoords
+		retval[0].texCoords = sf::Vector2f(left, top);
+		retval[1].texCoords = sf::Vector2f(left, top + height);
+		retval[2].texCoords = sf::Vector2f(left + width, top);
+		retval[3].texCoords = sf::Vector2f(left + width, top + height);
+
+		return retval;
 	}
 
-	return !reelData.empty();
-}
-
-void Animation::reset()
-{
-	spriteSheet = sf::Texture();
-	reelData.clear();
-}
-
-const sf::Texture* Animation::getTexture() const
-{
-	return &spriteSheet;
-}
-
-int Animation::maxRows() const
-{
-	return reelData.size();
-}
-
-const SpriteRowInfo& Animation::operator[](int index) const
-{
-	return reelData[index];
+	if (looping)
+		return frame(index % count);
+	//else
+	return frame(count);
 }
 
 //=====AnimatedSprite=====
 
-AnimatedSprite::AnimatedSprite(const Animation* animation, int row)
+AnimatedSprite::AnimatedSprite(const Animation* srcAnimation)
 {
-	animationSheet = animation;
-	animationRow = row;
-	toDraw.setTexture(*animation->getTexture());
-	updateFrame();
+	animation = srcAnimation;
 }
 
 //default arg: offset = 0
 void AnimatedSprite::start(int offset)
 {
-	int cols = getRowInfo().colCount;
-	animationFrame = (offset + cols) % cols;
+	chrono.timer = std::chrono::steady_clock::now() + animation->period * offset;
 	running = true;
-	timer.restart();
 }
 
 void AnimatedSprite::stop()
 {
+	if(running)
+		chrono.frame = getFrameNumber();
 	running = false;
 }
 
@@ -100,30 +87,21 @@ bool AnimatedSprite::isRunning() const
 
 void AnimatedSprite::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	const_cast<AnimatedSprite&>(*this).updateFrame();
-	states.transform *= getTransform();
-	target.draw(toDraw, states);
-}
-
-const SpriteRowInfo& AnimatedSprite::getRowInfo() const
-{
-	return (*animationSheet)[animationRow];
-}
-
-void AnimatedSprite::updateFrame()
-{
-	if (isRunning() && timer.getElapsedTime() > getRowInfo().period)
+	if (animation)
 	{
-		animationFrame++;
-		animationFrame %= getRowInfo().colCount;
-
-		toDraw.setTextureRect(sf::IntRect(
-			getRowInfo().colWidth * animationFrame, //left
-			getRowInfo().start,    //top
-			getRowInfo().colWidth, //width
-			getRowInfo().height)); //height
+		states.transform *= getTransform();
+		target.draw(animation->frame(getFrameNumber()), states);
 	}
 }
+
+int AnimatedSprite::getFrameNumber() const
+{
+	return running ? static_cast<int>((std::chrono::steady_clock::now() - chrono.timer) / animation->period) : chrono.frame;
+}
+
+AnimatedSprite::ChronoData::ChronoData()
+	: timer()
+{}
 
 }
 }
