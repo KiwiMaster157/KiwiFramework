@@ -2,8 +2,6 @@
 
 namespace kiwi
 {
-inline namespace v1
-{
 
 Frame::Frame(const sf::Texture* srcImage)
 	: texture(srcImage), varray(sf::TriangleStrip, 4)
@@ -24,7 +22,7 @@ sf::Vertex& Frame::operator[](int x)
 Frame Animation::frame(int index) const
 {
 	if (index < 0)
-		throw std::out_of_range("Negative frame position does not exist.");
+		throw std::out_of_range("Negative frame number does not exist.");
 
 	if (index <= count)
 	{
@@ -64,6 +62,28 @@ Frame Animation::frame(int index) const
 AnimatedSprite::AnimatedSprite(const Animation* srcAnimation)
 {
 	animation = srcAnimation;
+	chrono.frame = 0;
+}
+
+//default arg: offset = 0, go = true
+AnimatedSprite::AnimatedSprite(const Animation* srcAnimation, int offset, bool go)
+{
+	setAnimation(srcAnimation, offset, go);
+}
+
+const Animation* AnimatedSprite::getAnimation() const
+{
+	return animation;
+}
+
+//default arg: offset = 0, go = true
+void AnimatedSprite::setAnimation(const Animation* srcAnimation, int offset, bool go)
+{
+	animation = srcAnimation;
+	if (go)
+		start(offset);
+	else
+		chrono.frame = offset;
 }
 
 //default arg: offset = 0
@@ -80,12 +100,25 @@ void AnimatedSprite::stop()
 	running = false;
 }
 
+void AnimatedSprite::set(int offset)
+{
+	if (running)
+		start(offset);
+	else
+		chrono.frame = offset;
+}
+
 bool AnimatedSprite::isRunning() const
 {
 	return running;
 }
 
-void AnimatedSprite::draw(sf::RenderTarget& target, sf::RenderStates states) const
+int AnimatedSprite::getFrameNumber() const
+{
+	return running ? static_cast<int>((std::chrono::steady_clock::now() - chrono.timer) / animation->period) : chrono.frame;
+}
+
+void AnimatedSprite::drawAnimated(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	if (animation)
 	{
@@ -94,14 +127,13 @@ void AnimatedSprite::draw(sf::RenderTarget& target, sf::RenderStates states) con
 	}
 }
 
-int AnimatedSprite::getFrameNumber() const
+void AnimatedSprite::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	return running ? static_cast<int>((std::chrono::steady_clock::now() - chrono.timer) / animation->period) : chrono.frame;
+	drawAnimated(target, states);
 }
 
 AnimatedSprite::ChronoData::ChronoData()
 	: timer()
 {}
 
-}
 }

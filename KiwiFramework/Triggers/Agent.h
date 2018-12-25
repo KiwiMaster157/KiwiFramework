@@ -8,8 +8,6 @@
 
 namespace kiwi
 {
-inline namespace v1
-{
 
 template<typename TValue>
 struct AgentBase
@@ -112,7 +110,4 @@ private:
 	sf::RenderStates states;
 };
 
-
-
-}
 }

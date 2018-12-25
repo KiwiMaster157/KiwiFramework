@@ -5,8 +5,6 @@
 
 namespace kiwi
 {
-inline namespace v1
-{
 
 class Frame : public sf::Drawable
 {
@@ -44,20 +42,31 @@ public:
 
 	AnimatedSprite() = default;
 	explicit AnimatedSprite(const Animation* srcAnimation);
+	AnimatedSprite(const Animation* srcAnimation, int offset = 0, bool go = true);
 
 	virtual ~AnimatedSprite() = default;
 
-	//Can be used to start a stopped animation 
-	void start(int offset = 0);
+	const Animation* getAnimation() const;
 
+	void setAnimation(const Animation* srcAnimation, int offset = 0, bool go = true);
+
+	//Starts annimation at desired frame
+	void start(int offset = 0);
+	
+	//Stops animation in place
 	void stop();
+
+	//Sets frame without adjusting running status
+	void set(int offset);
 
 	bool isRunning() const;
 
-	//From sf::Drawable:
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override final;
-
 	int getFrameNumber() const;
+
+	void drawAnimated(sf::RenderTarget& target, sf::RenderStates states) const;
+
+	//From sf::Drawable:
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
 
@@ -72,5 +81,4 @@ private:
 	bool running = false;
 };
 
-}
 }

@@ -125,6 +125,7 @@
     <ClInclude Include="Agent.h" />
     <ClInclude Include="AgentUtils.h" />
     <ClInclude Include="Animatic.h" />
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="PredicateUtils.h" />
     <ClInclude Include="Trigger.h" />

@@ -6,8 +6,6 @@ namespace kiwi
 {
 namespace utility
 {
-inline namespace v1
-{
 
 template<typename T>
 using Predicate = std::function<bool(const T&)>;
@@ -70,6 +68,5 @@ inline Predicate<Mask> isNotUnmasked(const Mask& key)
 	return [=](const Mask& k)->bool {return !(k & ~key); };
 }
 
-}
 }
 }

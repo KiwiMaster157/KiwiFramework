@@ -7,8 +7,6 @@ namespace kiwi
 {
 namespace utility
 {
-inline namespace v1
-{
 
 enum class ToggleMode
 {
@@ -48,8 +46,5 @@ inline std::function<void(kiwi::Toggleable&)> toggleAgent(ToggleMode m)
 	}
 }
 
-
-
-}
 }
 }

@@ -4,8 +4,6 @@
 
 namespace kiwi
 {
-inline namespace v1
-{
 
 template<typename TIn, typename TOut>
 struct TriggerBase
@@ -43,5 +41,4 @@ struct Toggleable
 	bool activated = true;
 };
 
-}
 }

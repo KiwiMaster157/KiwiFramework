@@ -7,8 +7,6 @@
 
 namespace kiwi
 {
-inline namespace v1
-{
 
 //Note that ValueType may be an abstract type. Therefore, 
 template<typename KeyType, typename ValueType>
@@ -57,11 +55,6 @@ public:
 		data.push_back(std::make_pair(key, std::make_unique(std::move(val))));
 	}*/
 
-	Size remove(const Key& key)
-	{
-		return this->remove([&](const Key& k)->bool { return k == key; });
-	}
-
 	Size remove(const Pred& pred)
 	{
 		Size count = 0;
@@ -85,11 +78,6 @@ public:
 	void clear()
 	{
 		data.clear();
-	}
-
-	Size count(const Key& key) const
-	{
-		return this->count([&](const Key& k)->bool { return k == key; });
 	}
 
 	Size count(const Pred& pred) const
@@ -120,11 +108,6 @@ public:
 			});
 	}
 
-	void operator()(const Key& key, Agent fn)
-	{
-		(*this)([&](const Key& k)->bool { return k == key; }, fn);
-	}
-
 	void operator()(const Pred& pred, Agent fn)
 	{
 		for (auto& el : data)
@@ -148,5 +131,4 @@ private:
 	Container data; //Pair = std::pair<Key, ValuePtr>
 };
 
-}
 }
