@@ -9,7 +9,7 @@ namespace kiwi
 class Frame : public sf::Drawable
 {
 public:
-	explicit Frame(const sf::Texture* srcTexture);
+	Frame(const sf::Texture* srcTexture, int count, sf::PrimitiveType type = sf::TriangleFan);
 	virtual ~Frame() = default;
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
@@ -33,6 +33,7 @@ struct Animation
 	bool looping = true;
 
 	Frame frame(int index) const;
+	Frame frame(int index, const std::vector<sf::Vector2f>& outline, sf::PrimitiveType type = sf::TriangleFan) const;
 };
 
 //Prefer composition over inheritance
@@ -41,8 +42,7 @@ class AnimatedSprite: public sf::Drawable, public sf::Transformable
 public:
 
 	AnimatedSprite() = default;
-	explicit AnimatedSprite(const Animation* srcAnimation);
-	AnimatedSprite(const Animation* srcAnimation, int offset = 0, bool go = true);
+	explicit AnimatedSprite(const Animation* srcAnimation, int offset = 0, bool go = true);
 
 	virtual ~AnimatedSprite() = default;
 
@@ -57,7 +57,7 @@ public:
 	void stop();
 
 	//Sets frame without adjusting running status
-	void set(int offset);
+	void setFrame(int offset);
 
 	bool isRunning() const;
 
