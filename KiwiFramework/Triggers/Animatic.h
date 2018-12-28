@@ -36,25 +36,24 @@ struct Animation
 	Frame frame(int index, const std::vector<sf::Vector2f>& outline, sf::PrimitiveType type = sf::TriangleFan) const;
 };
 
-//Prefer composition over inheritance
-class AnimatedSprite: public sf::Drawable, public sf::Transformable
+class AnimatedBase
 {
 public:
 
-	AnimatedSprite() = default;
-	explicit AnimatedSprite(const Animation* srcAnimation, int offset = 0, bool go = true);
+	AnimatedBase() = default;
+	explicit AnimatedBase(const Animation* srcAnimation, int offset = 0, bool go = true);
 
-	virtual ~AnimatedSprite() = default;
+	~AnimatedBase() = default;
 
 	const Animation* getAnimation() const;
 
 	void setAnimation(const Animation* srcAnimation, int offset = 0, bool go = true);
 
 	//Starts annimation at desired frame
-	void start(int offset = 0);
+	void play(int offset = 0);
 	
 	//Stops animation in place
-	void stop();
+	void pause();
 
 	//Sets frame without adjusting running status
 	void setFrame(int offset);
@@ -64,9 +63,7 @@ public:
 	int getFrameNumber() const;
 
 	void drawAnimated(sf::RenderTarget& target, sf::RenderStates states) const;
-
-	//From sf::Drawable:
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+	void drawAnimated(sf::RenderTarget& target, sf::RenderStates states, const std::vector<sf::Vector2f>& outline, sf::PrimitiveType type = sf::TriangleFan) const;
 
 private:
 
@@ -74,7 +71,7 @@ private:
 
 	union ChronoData
 	{
-		ChronoData();
+		ChronoData(); //Default constructor
 		std::chrono::steady_clock::time_point timer;
 		int frame = 0;
 	} chrono;

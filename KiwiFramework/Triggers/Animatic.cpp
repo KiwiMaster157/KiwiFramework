@@ -65,76 +65,80 @@ Frame Animation::frame(int index, const std::vector<sf::Vector2f>& outline, sf::
 	return frame(count-1, outline, type);
 }
 
-//=====AnimatedSprite=====
+//=====AnimatedBase=====
 
 //default arg: offset = 0, go = true
-AnimatedSprite::AnimatedSprite(const Animation* srcAnimation, int offset, bool go)
+AnimatedBase::AnimatedBase(const Animation* srcAnimation, int offset, bool go)
 {
 	setAnimation(srcAnimation, offset, go);
 }
 
-const Animation* AnimatedSprite::getAnimation() const
+const Animation* AnimatedBase::getAnimation() const
 {
 	return animation;
 }
 
 //default arg: offset = 0, go = true
-void AnimatedSprite::setAnimation(const Animation* srcAnimation, int offset, bool go)
+void AnimatedBase::setAnimation(const Animation* srcAnimation, int offset, bool go)
 {
 	animation = srcAnimation;
 	if (go)
-		start(offset);
+		play(offset);
 	else
 		chrono.frame = offset;
 }
 
 //default arg: offset = 0
-void AnimatedSprite::start(int offset)
+void AnimatedBase::play(int offset)
 {
 	chrono.timer = std::chrono::steady_clock::now() + animation->period * offset;
 	running = true;
 }
 
-void AnimatedSprite::stop()
+void AnimatedBase::pause()
 {
 	if(running)
 		chrono.frame = getFrameNumber();
 	running = false;
 }
 
-void AnimatedSprite::setFrame(int offset)
+void AnimatedBase::setFrame(int offset)
 {
 	if (running)
-		start(offset);
+		play(offset);
 	else
 		chrono.frame = offset;
 }
 
-bool AnimatedSprite::isRunning() const
+bool AnimatedBase::isRunning() const
 {
 	return running;
 }
 
-int AnimatedSprite::getFrameNumber() const
+int AnimatedBase::getFrameNumber() const
 {
 	return running ? static_cast<int>((std::chrono::steady_clock::now() - chrono.timer) / animation->period) : chrono.frame;
 }
 
-void AnimatedSprite::drawAnimated(sf::RenderTarget& target, sf::RenderStates states) const
+void AnimatedBase::drawAnimated(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	if (animation)
 	{
-		states.transform *= getTransform();
 		target.draw(animation->frame(getFrameNumber()), states);
 	}
 }
 
-void AnimatedSprite::draw(sf::RenderTarget& target, sf::RenderStates states) const
+//default arg: type = sf::TriangleFan
+void AnimatedBase::drawAnimated(sf::RenderTarget& target, sf::RenderStates states, const std::vector<sf::Vector2f>& outline, sf::PrimitiveType type) const
 {
-	drawAnimated(target, states);
+	if (animation)
+	{
+		target.draw(animation->frame(getFrameNumber(), outline, type), states);
+	}
 }
 
-AnimatedSprite::ChronoData::ChronoData()
+
+AnimatedBase::ChronoData::ChronoData()
 	: timer()
 {}
 
