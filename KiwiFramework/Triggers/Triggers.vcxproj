@@ -119,19 +119,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animatic.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="Driver.cpp" />
+    <ClCompile Include="Library.cpp" />
+    <ClCompile Include="LibraryLoad.cpp" />
+    <ClCompile Include="Region.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Agent.h" />
     <ClInclude Include="AgentUtils.h" />
     <ClInclude Include="Animatic.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="Library.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="PredicateUtils.h" />
+    <ClInclude Include="Region.h" />
     <ClInclude Include="Trigger.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="TestAnimation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="animationTest.txt" />
+    <Text Include="regionTest.txt" />
+    <Text Include="textureTest.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

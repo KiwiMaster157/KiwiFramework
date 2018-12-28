@@ -1,0 +1,6 @@
+#This file contains data about textures to be loaded
+#Format:
+#name=file
+
+test1=TestAnimation.png
+
