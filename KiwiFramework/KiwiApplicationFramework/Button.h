@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Trigger.h"
 #include "Animatic.h"
 #include "Region.h"
 
@@ -38,12 +37,13 @@ struct ButtonEvent
 	sf::Vector2i coords;
 };
 
-class Button : public ButtonBase<sf::Event, ButtonEvent>, public sf::Transformable, public AnimatedBase
+class Button : public sf::Drawable, public sf::Transformable, public AnimatedBase
 {
 public:
 	
 	Button() = default;
 	Button(const Animation* srcAnimation, const Region* srcRegion);
+	virtual ~Button() = default;
 
 	bool isHovering() const;
 	MouseButtons getButtons() const;
@@ -51,12 +51,7 @@ public:
 	void resetButton();
 
 	void drawButton(sf::RenderTarget& target, sf::RenderStates states) const;
-
-	//From Drawable:
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-
-	//From TriggerBase:
-	virtual bool trigger(const sf::Event& from, ButtonEvent& to) override;
+	virtual bool trigger(const sf::Event& from, ButtonEvent& to);
 
 	void setRegion(const Region* newRegion);
 	const Region* getRegion() const;
@@ -65,6 +60,8 @@ public:
 	bool isAttached() const;
 	sf::Vector2f attachedTo() const; //point (0, 0) if not attached
 	
+	//From Drawable:
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
 private:
 
