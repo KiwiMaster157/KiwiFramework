@@ -11,9 +11,6 @@ namespace kiwi
 using ButtonID = std::string;
 using MouseButtons = std::bitset<sf::Mouse::ButtonCount>;
 
-const int BUTTON_CODES = 64; //This value can be changed based on needs
-using Code = std::bitset<BUTTON_CODES>;
-
 struct ButtonEvent
 {
 	ButtonID id;
