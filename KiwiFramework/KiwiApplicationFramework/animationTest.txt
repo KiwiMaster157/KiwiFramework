@@ -1,0 +1,10 @@
+#This file contains data about animations to be loaded
+#Format:
+#name=textureName
+#originX originY width height columns length period looping
+
+test1=test1
+0 0 32 32 4 8 200 1
+
+test2=test1
+32 32 32 32 3 3 200 1

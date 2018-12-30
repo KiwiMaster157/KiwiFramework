@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\KiwiFramework"
+    "\\KiwiFramework",
+    "\\KiwiFramework\\KiwiApplicationFramework"
   ],
-  "SelectedNode": "\\KiwiFramework\\Triggers",
+  "SelectedNode": "\\KiwiFramework\\KiwiFramework.sln",
   "PreviewInSolutionExplorer": false
 }
