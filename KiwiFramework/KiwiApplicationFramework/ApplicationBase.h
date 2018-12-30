@@ -33,13 +33,13 @@ protected:
 	//Virtual interface
 
 	virtual void initialize(const std::vector<std::string>& args) = 0;
-	virtual int finalize() = 0;
+	virtual int finalize();//returns 0 by default
 
 	enum EventReturn
 	{
-		Normal,   //Successfully processed
+		Normal = 0,//Successfully processed
 		FatalError,//Forced crash (will NOT run finalize() before exiting program. Returns -1.)
-		Retry,     //Reprocess event.
+		Retry,     //Reprocess event (Precedence over timer interrupt).
 		Quit,      //Exit program (runs finalize() and exits program)
 		Render,    //Run render sequence immediately
 
@@ -53,7 +53,7 @@ protected:
 	virtual EventReturn eventKeyPress(sf::Keyboard::Key key) = 0;
 	virtual EventReturn eventKeyHold(sf::Keyboard::Key key) = 0;
 	virtual EventReturn eventKeyRelease(sf::Keyboard::Key key) = 0;
-	virtual EventReturn eventTimer() = 0;
+	virtual EventReturn eventTimer(const std::string& name) = 0;
 	virtual EventReturn eventScroll(float delta, sf::Mouse::Wheel wheel) = 0;
 	virtual EventReturn eventButton(const ButtonEvent& button) = 0;
 

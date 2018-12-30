@@ -6,6 +6,12 @@
 namespace kiwi
 {
 
+//virtual
+int ApplicationBase::finalize()
+{
+	return 0;
+}
+
 int ApplicationBase::run(const std::vector<std::string>& args)
 {
 	appCursor.loadFromSystem(sf::Cursor::Arrow);
@@ -26,24 +32,45 @@ int ApplicationBase::run(const std::vector<std::string>& args)
 
 		//Event handling
 
-		while ([&]()->bool
-			{
-				if (status == EventReturn::Quit || status == EventReturn::Render || status == EventReturn::FatalError)
-					return false;
-				if (status == EventReturn::Retry)
-					return true;
-				if (!appButtonQueue.empty())
-				{
-					appButtonQueue.pop_front();
-					if (!appButtonQueue.empty())
-						return true;
-				}
-				return appWindow.pollEvent(systemEvent);
-			}())
+		status = EventReturn::Normal;
+
+		while (true)
 		{
+			//Next event setup
+			//Precedence:
+			//1. Status Effects (Quit, Render, FatalError, Retry)
+			//2. Timer Interrupts
+			//3. Button Events
+			//4. System Events
+
+			if (status == EventReturn::Quit || status == EventReturn::Render)
+				break;
+			if (status == EventReturn::FatalError)
+				return -1;
+
+			if (status != EventReturn::Retry)
+			{
+				if (endingTime() < getTime())
+				{
+					status = eventTimer(nextTimerKey());
+					cancelTimer(nextTimerKey());
+					continue;
+				}
+				if (!appButtonQueue.empty())
+					appButtonQueue.pop_front();
+				else if (appButtonQueue.empty())
+					appWindow.pollEvent(systemEvent);
+			}
+
+			//Run button event
 			if (!appButtonQueue.empty())
+			{
 				status = eventButton(appButtonQueue.front());
-			else switch (systemEvent.type)
+				continue;
+			}
+			
+			//Run application event
+			switch (systemEvent.type)
 			{
 			case sf::Event::Closed:
 				status = eventClose();
@@ -75,6 +102,9 @@ int ApplicationBase::run(const std::vector<std::string>& args)
 				appKeys.reset(systemEvent.key.code);
 				status = eventKeyRelease(systemEvent.key.code);
 				break;
+			case sf::Event::MouseWheelScrolled:
+				status = eventScroll(systemEvent.mouseWheelScroll.delta, systemEvent.mouseWheelScroll.wheel);
+				break;
 			case sf::Event::MouseMoved:
 			case sf::Event::MouseButtonPressed:
 			case sf::Event::MouseButtonReleased:
@@ -105,9 +135,6 @@ int ApplicationBase::run(const std::vector<std::string>& args)
 				//Other events
 			}
 		}
-		if (status == EventReturn::FatalError)
-			return -1;
-
 	}
 
 	return finalize();
