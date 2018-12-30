@@ -43,10 +43,7 @@ class Button : public ButtonBase<sf::Event, ButtonEvent>, public sf::Transformab
 public:
 	
 	Button() = default;
-	Button(const ButtonID& id, const Animation* srcAnimation, const Region* srcRegion);
-
-	const ButtonID& getID() const;
-	void setID(const ButtonID& id);
+	Button(const Animation* srcAnimation, const Region* srcRegion);
 
 	bool isHovering() const;
 	MouseButtons getButtons() const;
@@ -73,7 +70,6 @@ private:
 
 	const Region* region = nullptr;
 
-	ButtonID identity;
 	const sf::Vector2f* attachTarget = nullptr;
 
 	//Tracks which mouse buttons have been activated on this button

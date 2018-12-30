@@ -3,21 +3,10 @@
 namespace kiwi
 {
 
-Button::Button(const ButtonID& id, const Animation* srcAnimation, const Region* srcRegion)
+Button::Button(const Animation* srcAnimation, const Region* srcRegion)
 {
-	setID(id);
 	setAnimation(srcAnimation);
 	setRegion(srcRegion);
-}
-
-const ButtonID& Button::getID() const
-{
-	return identity;
-}
-
-void Button::setID(const ButtonID& id)
-{
-	identity = id;
 }
 
 bool Button::isHovering() const
@@ -65,7 +54,6 @@ bool Button::trigger(const sf::Event& from, ButtonEvent& to)
 		{
 			btns.set(from.mouseButton.button);
 
-			to.id = getID();
 			to.type = ButtonEvent::Press;
 			to.active = from.mouseButton.button;
 			to.btns = btns;
@@ -80,7 +68,6 @@ bool Button::trigger(const sf::Event& from, ButtonEvent& to)
 		if (btns.test(from.mouseButton.button))
 		{
 			btns.reset(from.mouseButton.button);
-			to.id = getID();
 			to.type = (isHovering() ? ButtonEvent::Release : ButtonEvent::Reset);
 			to.active = from.mouseButton.button;
 			to.btns = btns;
@@ -102,7 +89,6 @@ bool Button::trigger(const sf::Event& from, ButtonEvent& to)
 		{
 			if (isHovering())
 			{
-				to.id = getID();
 				to.type = ButtonEvent::HoverMove;
 				to.active = sf::Mouse::Button::ButtonCount;
 				to.btns = btns;
@@ -114,7 +100,6 @@ bool Button::trigger(const sf::Event& from, ButtonEvent& to)
 			else
 			{
 				hovering = true;
-				to.id = getID();
 				to.type = ButtonEvent::HoverBegin;
 				to.active = sf::Mouse::Button::ButtonCount;
 				to.btns = btns;
@@ -127,7 +112,6 @@ bool Button::trigger(const sf::Event& from, ButtonEvent& to)
 		else if(isHovering())
 		{
 			hovering = false;
-			to.id = getID();
 			to.type = ButtonEvent::HoverEnd;
 			to.active = sf::Mouse::Button::ButtonCount;
 			to.btns = btns;

@@ -6,6 +6,7 @@
 
 #include "Animatic.h"
 #include "Region.h"
+#include "Button.h"
 
 namespace kiwi
 {
@@ -38,6 +39,7 @@ public:
 	//Animation
 	const Animation* getAnimation(const Key& name) const;
 	void setAnimation(const Key& name, const Animation& src);//insert or modify
+	//setAnimation with rvalue reference not necessary
 	//Format : name=textureName (no spaces)
 	//Next ln: originX originY width height columns length period looping (space delimited, looping={1,0}, period in ms)
 	int loadAnimationFile(const std::string& file);

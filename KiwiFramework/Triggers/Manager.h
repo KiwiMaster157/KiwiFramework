@@ -4,6 +4,7 @@
 #include <memory>
 #include <utility>
 #include <functional>
+#include <thread>
 
 namespace kiwi
 {
